@@ -85,7 +85,8 @@ con_venue_ger
 
 # The number of results on the main list is 20 but we have some nested lists which all
 # have different length. You can find information about the name, the city, the 
-# URL or the location of venue.
+# URL or the location of venue. For Germany we can find 238 pages with 20 entries 
+# per page.
 ```
 
 
@@ -170,3 +171,137 @@ city, postalCode, address, url, longitude, and latitude. Join the information in
 data frame. Print the first 10 rows and the shape of the resulting data frame. The resulting data frame
 should look something like this (note that the exact number of search results may have changed since
 this document has been last modified):
+
+```{r}
+
+# Create a function that creates the data frame.
+create_df <- function(countryCode){
+  page <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
+                     query = list(apikey = ticket_master_key,
+                                  "countryCode" = countryCode))
+  Sys.sleep(0.2)
+  con_page <- content(page)
+  nr_pages <- con_page$page$totalPages
+  nr_entries <- con_page$page$size
+  
+  df_all <- data.frame(name = character(), 
+                       city = character(), 
+                       postalCode = double(),
+                       address = character(), 
+                       url = character(), 
+                       longitude = double(), 
+                       latitude = double())
+  
+  for (p in 0:(nr_pages - 1)) {
+    
+    # often the api requests throws out an erro when looping over multiple pages
+    # that is why while loop is introduced
+    control <- NULL
+    while(is.null(control)) {
+    
+    page <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
+                     query = list(apikey = ticket_master_key,
+                                  "countryCode" = countryCode,
+                                  "page" = p))
+    content = content(page)
+    
+    control <- content$`_embedded`$venues
+  }
+   
+# the last page is usually not full 
+# to get the number of elements on the last page this if-statement is created:
+if (p == (nr_pages - 1)) {
+  nr_entries = con_page$page$totalElements %% nr_entries
+}
+ 
+    ## name
+name <- map_chr(content$`_embedded`$venues, "name", .default = NA)
+
+## city
+# create empty city-vector
+city <- c()
+# loop over all 20 venues
+for (i in 1:nr_entries) {
+  # add name to city vector
+  city <- append(city, ifelse(is.null(content$`_embedded`$venues[[i]]$city$name),NA,
+                              content$`_embedded`$venues[[i]]$city$name))
+}
+
+
+## postal code 
+# create posal code vector (map_dbl doesnt work), default to prevent error if value is missing
+postalCode <- as.double(map_chr(content$`_embedded`$venues, "postalCode", .default = NA))
+
+
+## address
+# create empty adress vector
+address <- c()
+# append values via loop
+# if there is no such value create NA
+for (i in 1:nr_entries) {
+  address <- append(address, ifelse(is.null(content$`_embedded`$venues[[i]]$address$line1),
+                                    NA, content$`_embedded`$venues[[i]]$address$line1))
+}
+
+## url 
+# create url vector
+url <- map_chr(content$`_embedded`$venues, "url", .default = NA)
+
+## longitude 
+# create empty longitude-vector
+longitude <- c()
+# loop over all 20 venues
+# if the value does not exist ->NA, else append by the specific value
+for (i in 1:nr_entries) {
+  # add name to longitude vector
+  longitude <- append(longitude, ifelse(is.null(content$`_embedded`$venues[[i]]$location$longitude),
+                                    NA, content$`_embedded`$venues[[i]]$location$longitude))
+}
+# change datatype to double
+longitude <- as.double(longitude)
+
+## latitude
+# create empty latitude-vector
+latitude <- c()
+# loop over all 20 venues
+# if the value doesn exist ->NA, else append by the specific value
+for (i in 1:nr_entries) {
+  # add name to longitude vector
+  latitude <- append(latitude, ifelse(is.null(content$`_embedded`$venues[[i]]$location$latitude),
+                                    NA, content$`_embedded`$venues[[i]]$location$latitude))
+}
+# change datatype to double
+latitude <- as.double(latitude)
+print(p)
+# create dataframe
+df_page <- data.frame(name, city, postalCode,address, url, longitude, latitude)
+
+df_all <- rbind(df_all, df_page)
+#print("hello world 2")
+#
+Sys.sleep(0.2)
+
+  }
+  
+  return(df_all)
+}
+
+german_df <- create_df("DE")
+
+# We you run the code you can see that the code interrupt always a tdifferent points
+# sometimes around page 100 but sometime around page 40 or 80 (always after a different
+# time). we assume that the website kicks us out.
+
+head(german_df, 10)
+dim(german_df)
+
+```
+
+
+
+
+
+
+
+
+
