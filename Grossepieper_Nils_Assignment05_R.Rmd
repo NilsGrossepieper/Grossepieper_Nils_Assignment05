@@ -405,8 +405,7 @@ plot.caption = element_text(face = "italic"))
 ```{r}
 # Exercise 11
 
-# Longitude is out of the range (5.866, 15.042) or where the value of latitude is
-# outside the range (47.270, 55.059)
+# Maximum longitude and latitude of Czech Republic:
 venue_de_adjust <- adapt_long_lat(czech_df, 12.053, 18.513, 48.331, 51.032)
 
 # visualize venues with new
