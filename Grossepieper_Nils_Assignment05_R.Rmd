@@ -328,9 +328,41 @@ where the value of latitude is outside the range (47.270, 55.059) (these coordin
 been derived from the extreme points of Germany as listed on Wikipedia (see here). For extreme points
 of other countries, see here).
 
+```{r}
+# create NAs for latitude / longitude if  outside from Germany
+# write a function to make life easier for the next tasks
 
+adapt_long_lat <- function(df_country,long_lower,long_upper,lat_lower,lat_upper){
+  df_country$longitude <- ifelse(df_country$longitude < long_lower, NA, df_country$longitude)
+  
+  df_country$longitude <- ifelse(df_country$longitude > long_upper, NA, df_country$longitude)
+  
+  df_country$latitude <- ifelse(df_country$latitude < lat_lower, NA, df_country$latitude)
+  
+  df_country$latitude <- ifelse(df_country$latitude > lat_upper, NA, df_country$latitude)
+  
+  return(df_country)
+}
 
+# Longitude is out of the range (5.866, 15.042) or where the value of latitude is
+# outside the range (47.270, 55.059)
+venue_de_adjust <- adapt_long_lat(german_df, 5.866, 15.042, 47.270, 55.059)
 
+# visualize venues with new
+# based on the code that is mentioned in the assignment 
+ggplot(venue_de_adjust) +
+borders("world", "Germany", colour = "black", fill = "grey90") +
+  # add geom_point to create points for the locations
+  # add alpha to make points transparent (-> to make overlaying points visible)
+  geom_point(aes(longitude,latitude),
+             alpha = 0.4) +
+theme_void() +
+coord_quickmap() +
+labs(title = "Event locations across Germany",
+caption = "Source: ticketmaster.com") +
+theme(title = element_text(size = 8, face = 'bold'),
+plot.caption = element_text(face = "italic"))
 
-
-
+# The new data frame gives you a much better format where you can see all points
+# very clear. Only some points are still located outside of Germany.
+``` 
