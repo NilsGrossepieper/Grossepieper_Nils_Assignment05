@@ -51,3 +51,14 @@ is not secret per se (it is publicly visible on the API Explorer website), pleas
 comply to the common secrecy practices discussed in the lecture and the tutorial:
 Treat the API key as a secret token. Your API key should neither appear in the code
 that you are submitting nor in your public GitHub repository.
+
+```{r}
+
+# Read the script with the API key:
+source("C:/Users/gross/OneDrive/Dokumente/data/ticket_master_api_key_script.R")
+
+```
+
+
+(7) Perform a first GET request, that searches for event venues in Germany (countryCode = "DE"). Extract
+the content from the response object and inspect the resulting list. Describe what you can see.
