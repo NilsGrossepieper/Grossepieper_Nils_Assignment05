@@ -297,7 +297,36 @@ dim(german_df)
 
 ```
 
+(10) Below, you can find code that produces a map of Germany. Add points to the map indicating the
+locations of the event venues across Germany.
 
+```{r}
+
+# based on the code that is mentioned in the assignment 
+ggplot(german_df) +
+borders("world", "Germany", colour = "black", fill = "grey90") +
+  # add geom_point to create points for the locations
+  # add alpha to make points transparent (-> to make overlaying points visible)
+  geom_point(aes(longitude,latitude),
+             alpha = 0.4) +
+theme_void() +
+coord_quickmap() +
+labs(title = "Event locations across Germany",
+caption = "Source: ticketmaster.com") +
+theme(title = element_text(size = 8, face = 'bold'),
+plot.caption = element_text(face = "italic"))
+
+# The visualization is not very practical, since Germany can not bee seen very 
+# well. In addition we have some points which are clearly located outside of 
+# Germany.
+```
+
+
+(11) You will find that some coordinates lie way beyond the German borders and can be assumed to be faulty.
+Set coordinate values to NA where the value of longitude is outside the range (5.866, 15.042) or
+where the value of latitude is outside the range (47.270, 55.059) (these coordinate ranges have
+been derived from the extreme points of Germany as listed on Wikipedia (see here). For extreme points
+of other countries, see here).
 
 
 
