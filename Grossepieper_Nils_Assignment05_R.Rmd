@@ -366,3 +366,64 @@ plot.caption = element_text(face = "italic"))
 # The new data frame gives you a much better format where you can see all points
 # very clear. Only some points are still located outside of Germany.
 ``` 
+
+
+(12) Repeat exercises (9)–(11) for another European country of your choice. (Hint: Clean code pays off! If
+you have coded the exercises efficiently, only very few adaptions need to be made.)
+
+```{r}
+# I will do the exercises 9 to 11 with the country Czech Republic and its country 
+# code 'CZ'
+
+# Exercise 9
+czech_df <- create_df("CZ")
+head(czech_df, 10)
+dim(czech_df)
+
+```
+```{r}
+# Exercise 10
+
+# based on the code that is mentioned in the assignment 
+ggplot(czech_df) +
+borders("world", "Czech Republic", colour = "black", fill = "grey90") +
+  # add geom_point to create points for the locations
+  # add alpha to make points transparent (-> to make overlaying points visible)
+  geom_point(aes(longitude,latitude),
+             alpha = 0.4) +
+theme_void() +
+coord_quickmap() +
+labs(title = "Event locations across Czech Republic",
+caption = "Source: ticketmaster.com") +
+theme(title = element_text(size = 8, face = 'bold'),
+plot.caption = element_text(face = "italic"))
+
+# The visualization is not very practical, since the Czech Republic can not bee
+# seen very  well. In addition we have some points which are clearly located outside of 
+# the Czech Republic.
+```
+```{r}
+# Exercise 11
+
+# Longitude is out of the range (5.866, 15.042) or where the value of latitude is
+# outside the range (47.270, 55.059)
+venue_de_adjust <- adapt_long_lat(czech_df, 12.053, 18.513, 48.331, 51.032)
+
+# visualize venues with new
+# based on the code that is mentioned in the assignment 
+ggplot(venue_de_adjust) +
+borders("world", "Czech Republic", colour = "black", fill = "grey90") +
+  # add geom_point to create points for the locations
+  # add alpha to make points transparent (-> to make overlaying points visible)
+  geom_point(aes(longitude,latitude),
+             alpha = 0.4) +
+theme_void() +
+coord_quickmap() +
+labs(title = "Event locations across Czech Republic",
+caption = "Source: ticketmaster.com") +
+theme(title = element_text(size = 8, face = 'bold'),
+plot.caption = element_text(face = "italic"))
+
+# The new data frame gives you a much better format where you can see all points
+# very clear. Only some points are still located outside of the Czech Republic.
+``` 
