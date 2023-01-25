@@ -62,3 +62,28 @@ source("C:/Users/gross/OneDrive/Dokumente/data/ticket_master_api_key_script.R")
 
 (7) Perform a first GET request, that searches for event venues in Germany (countryCode = "DE"). Extract
 the content from the response object and inspect the resulting list. Describe what you can see.
+
+```{r, warning = FALSE}
+
+# Import all necessary libraries:
+library(httr)
+library(tidyverse)
+library(magrittr)
+library(maps)
+
+```
+
+```{r}
+# Search for all venues in Germany (page1) (where countryCode = 'DE')
+res_venue_ger <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
+                     query = list(apikey = ticket_master_key,
+                                  "countryCode" = "DE"))
+
+# Print out the query:
+con_venue_ger <- content(res_venue_ger)
+con_venue_ger
+
+# The number of results on the main list is 20 but we have some nested lists which all
+# have different length. You can find information about the name, the city, the 
+# URL or the location of venue.
+```
