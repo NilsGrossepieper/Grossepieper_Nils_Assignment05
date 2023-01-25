@@ -272,7 +272,7 @@ for (i in 1:nr_entries) {
 }
 # change datatype to double
 latitude <- as.double(latitude)
-print(p)
+
 # create dataframe
 df_page <- data.frame(name, city, postalCode,address, url, longitude, latitude)
 
