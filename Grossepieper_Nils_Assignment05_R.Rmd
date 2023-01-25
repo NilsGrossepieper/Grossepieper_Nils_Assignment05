@@ -87,3 +87,74 @@ con_venue_ger
 # have different length. You can find information about the name, the city, the 
 # URL or the location of venue.
 ```
+
+
+(8) Extract the name, the city, the postalCode and address, as well as the url and the longitude
+and latitude of the venues to a data frame.
+
+```{r}
+# name
+# extract the name information:
+name <- map_chr(con_venue_ger$`_embedded`$venues, "name")
+
+# city
+# create empty city vector:
+city <- c()
+# loop over all 20 venues:
+for (i in 1:20) {
+  # add the cities to the vector
+  city <- append(city, con_venue_ger$`_embedded`$venues[[i]]$city$name)
+}
+
+# postalCode
+# create postal code vector (map_dpl does not work), default to:
+postalCode <- as.double(map_chr(con_venue_ger$`_embedded`$venues, "postalCode",
+                                .default = "NA"))
+
+# address
+# create an empty address vector:
+address <- c()
+# append values via loop
+# if there is no such value create NA:
+for (i in 1:20) {
+  address <- append(address,
+                   ifelse(is.null(con_venue_ger$`_embedded`$venues[[i]]$address$line1),
+                          NA, con_venue_ger$`_embedded`$venues[[i]]$address$line1))
+}
+
+# url
+# extract the url information:
+url <- map_chr(con_venue_ger$`_embedded`$venues, "url")
+
+# longitude
+# create empty vector longitude-vector:
+longitude <- c()
+# loop over all 20 venues 
+# if the value does not exist -> NA, else append by the specific value
+for (i in 1:20) {
+  # add values to longitude vector 
+  longitude <- append(longitude,
+                      ifelse(is.null(con_venue_ger$`_embedded`$venues[[i]]$location$longitude),
+                             NA, con_venue_ger$`_embedded`$venues[[i]]$location$longitude))
+}
+# change the data type to double
+longitude <- as.double(longitude)
+
+# latitude
+# create empty vector latitude-vector
+latitude <- c()
+# loop over all 20 venues 
+# if the value does not exist -> NA, else append by the specific value
+for (i in 1:20) {
+  # add name to longitude vector 
+  latitude <- append(latitude,
+                      ifelse(is.null(con_venue_ger$`_embedded`$venues[[i]]$location$latitude),
+                             NA, con_venue_ger$`_embedded`$venues[[i]]$location$latitude))
+}
+# change the data type to double
+latitude <- as.double(latitude)
+
+# create the data frame:
+venue_ger <- data.frame(name, city, postalCode, address, url, longitude, latitude)
+head(venue_ger)
+```
