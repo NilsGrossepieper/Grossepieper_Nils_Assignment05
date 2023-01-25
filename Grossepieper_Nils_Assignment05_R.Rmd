@@ -158,3 +158,15 @@ latitude <- as.double(latitude)
 venue_ger <- data.frame(name, city, postalCode, address, url, longitude, latitude)
 head(venue_ger)
 ```
+
+
+(9) Have a closer look at the list element named page. Did your GET request from exercise (7) return all
+event locations in Germany? Obviously not - there are of course much more venues in Germany than
+those contained in this list. Your GET request only yielded the first results page containing the first
+20 out of several thousands of venues. Check the API documentation under the section Venue Search.
+How can you request the venues from the remaining results pages? Iterate over the results pages and
+perform GET requests for all venues in Germany. After each iteration, extract the seven variables name,
+city, postalCode, address, url, longitude, and latitude. Join the information in one large
+data frame. Print the first 10 rows and the shape of the resulting data frame. The resulting data frame
+should look something like this (note that the exact number of search results may have changed since
+this document has been last modified):
