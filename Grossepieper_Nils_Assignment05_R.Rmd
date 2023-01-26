@@ -83,10 +83,13 @@ res_venue_ger <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
 con_venue_ger <- content(res_venue_ger)
 con_venue_ger
 
-# The number of results on the main list is 20 but we have some nested lists which all
-# have different length. You can find information about the name, the city, the 
-# URL or the location of venue. For Germany we can find 238 pages with 20 entries 
-# per page.
+# You can see several lists that are sub-lists of other lists. For each venue you
+# can find different attributes like the name, the address or the coordinates
+# (longitude and latitude). These attributes are not located all on the same layer
+# but longitude and latitude for example are located at different layers than name.
+# At the end of the output you can see how many elements and pages are contained
+# in the API request for 'DE'. In total we have 12932 elements on 647 pages with 20
+# entries per page (the last) page does not have the full 20 entries.
 ```
 
 
@@ -157,7 +160,7 @@ latitude <- as.double(latitude)
 
 # create the data frame:
 venue_ger <- data.frame(name, city, postalCode, address, url, longitude, latitude)
-head(venue_ger)
+venue_ger
 ```
 
 
@@ -179,11 +182,12 @@ create_df <- function(countryCode){
   page <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
                      query = list(apikey = ticket_master_key,
                                   "countryCode" = countryCode, "locale" = "*"))
+  # set the sleeping time according to the website
   Sys.sleep(0.2)
   con_page <- content(page)
   nr_pages <- con_page$page$totalPages
   nr_entries <- con_page$page$size
-  
+  # create an empty data frame 
   df_all <- data.frame(name = character(), 
                        city = character(), 
                        postalCode = double(),
@@ -191,10 +195,10 @@ create_df <- function(countryCode){
                        url = character(), 
                        longitude = double(), 
                        latitude = double())
-  
+  # create a loop which loops over all pages:
   for (p in 0:(nr_pages - 1)) {
     
-    # often the api requests throws out an erro when looping over multiple pages
+    # often the api requests throws out an error when looping over multiple pages
     # that is why while loop is introduced
     control <- NULL
     while(is.null(control)) {
@@ -214,7 +218,7 @@ if (p == (nr_pages - 1)) {
   nr_entries = con_page$page$totalElements %% nr_entries
 }
  
-    ## name
+## name
 name <- map_chr(content$`_embedded`$venues, "name", .default = NA)
 
 ## city
@@ -229,7 +233,7 @@ for (i in 1:nr_entries) {
 
 
 ## postal code 
-# create posal code vector (map_dbl doesnt work), default to prevent error if value is missing
+# create postal code vector (map_dbl does not work), default to prevent error if value is missing
 postalCode <- as.double(map_chr(content$`_embedded`$venues, "postalCode", .default = NA))
 
 
@@ -264,7 +268,7 @@ longitude <- as.double(longitude)
 # create empty latitude-vector
 latitude <- c()
 # loop over all 20 venues
-# if the value doesn exist ->NA, else append by the specific value
+# if the value does not exist ->NA, else append by the specific value
 for (i in 1:nr_entries) {
   # add name to longitude vector
   latitude <- append(latitude, ifelse(is.null(content$`_embedded`$venues[[i]]$location$latitude),
@@ -273,25 +277,21 @@ for (i in 1:nr_entries) {
 # change datatype to double
 latitude <- as.double(latitude)
 
-# create dataframe
+# create data frame
 df_page <- data.frame(name, city, postalCode,address, url, longitude, latitude)
 
 df_all <- rbind(df_all, df_page)
-#print("hello world 2")
-#
+
 Sys.sleep(0.2)
 
   }
-  
+  # set the data frame as the output of the function
   return(df_all)
 }
 
 german_df <- create_df("DE")
 
-# We you run the code you can see that the code interrupt always at different points
-# sometimes around page 100 but sometime around page 40 or 80 (always after a different
-# time). we assume that the website kicks us out.
-
+# get the requested output, head(10) and the dimensions of the data frame
 head(german_df, 10)
 dim(german_df)
 
@@ -372,57 +372,57 @@ plot.caption = element_text(face = "italic"))
 you have coded the exercises efficiently, only very few adaptions need to be made.)
 
 ```{r}
-# I will do the exercises 9 to 11 with the country Czech Republic and its country 
-# code 'CZ'
+# I will do the exercises 9 to 11 with the country Poland and its country 
+# code 'PL'
 
 # Exercise 9
-czech_df <- create_df("PL")
-head(czech_df, 10)
-dim(czech_df)
+poland_df <- create_df("PL")
+head(poland_df, 10)
+dim(poland_df)
 
 ```
 ```{r}
 # Exercise 10
 
 # based on the code that is mentioned in the assignment 
-ggplot(czech_df) +
-borders("world", "Czech Republic", colour = "black", fill = "grey90") +
+ggplot(poland_df) +
+borders("world", "Poland", colour = "black", fill = "grey90") +
   # add geom_point to create points for the locations
   # add alpha to make points transparent (-> to make overlaying points visible)
   geom_point(aes(longitude,latitude),
              alpha = 0.4) +
 theme_void() +
 coord_quickmap() +
-labs(title = "Event locations across Czech Republic",
+labs(title = "Event locations across Poland",
 caption = "Source: ticketmaster.com") +
 theme(title = element_text(size = 8, face = 'bold'),
 plot.caption = element_text(face = "italic"))
 
-# The visualization is not very practical, since the Czech Republic can not bee
+# The visualization is not very practical, since Poland can not bee
 # seen very  well. In addition we have some points which are clearly located outside of 
-# the Czech Republic.
+# Poland
 ```
 ```{r}
 # Exercise 11
 
-# Maximum longitude and latitude of Czech Republic:
-venue_cz_adjust <- adapt_long_lat(czech_df, 12.053, 18.513, 48.331, 51.032)
+# Maximum longitude and latitude of Poland:
+venue_PL_adjust <- adapt_long_lat(poland_df, 14.123, 24.146, 49.002, 54.502)
 
 # visualize venues with new
 # based on the code that is mentioned in the assignment 
-ggplot(venue_cz_adjust) +
-borders("world", "Czech Republic", colour = "black", fill = "grey90") +
+ggplot(venue_PL_adjust) +
+borders("world", "Poland", colour = "black", fill = "grey90") +
   # add geom_point to create points for the locations
   # add alpha to make points transparent (-> to make overlaying points visible)
   geom_point(aes(longitude,latitude),
              alpha = 0.4) +
 theme_void() +
 coord_quickmap() +
-labs(title = "Event locations across Czech Republic",
+labs(title = "Event locations across Poland",
 caption = "Source: ticketmaster.com") +
 theme(title = element_text(size = 8, face = 'bold'),
 plot.caption = element_text(face = "italic"))
 
 # The new data frame gives you a much better format where you can see all points
-# very clear. Only some points are still located outside of the Czech Republic.
+# very clear. Only some points are still located outside of Poland.
 ``` 
