@@ -77,7 +77,7 @@ library(maps)
 # Search for all venues in Germany (page1) (where countryCode = 'DE')
 res_venue_ger <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
                      query = list(apikey = ticket_master_key,
-                                  "countryCode" = "DE"))
+                                  "countryCode" = "DE", "locale" = "*"))
 
 # Print out the query:
 con_venue_ger <- content(res_venue_ger)
@@ -178,7 +178,7 @@ this document has been last modified):
 create_df <- function(countryCode){
   page <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
                      query = list(apikey = ticket_master_key,
-                                  "countryCode" = countryCode))
+                                  "countryCode" = countryCode, "locale" = "*"))
   Sys.sleep(0.2)
   con_page <- content(page)
   nr_pages <- con_page$page$totalPages
@@ -202,7 +202,7 @@ create_df <- function(countryCode){
     page <- GET(url = "https://app.ticketmaster.com/discovery/v2/venues/",
                      query = list(apikey = ticket_master_key,
                                   "countryCode" = countryCode,
-                                  "page" = p))
+                                  "page" = p, "locale" = "*"))
     content = content(page)
     
     control <- content$`_embedded`$venues
@@ -288,7 +288,7 @@ Sys.sleep(0.2)
 
 german_df <- create_df("DE")
 
-# We you run the code you can see that the code interrupt always a tdifferent points
+# We you run the code you can see that the code interrupt always at different points
 # sometimes around page 100 but sometime around page 40 or 80 (always after a different
 # time). we assume that the website kicks us out.
 
@@ -376,7 +376,7 @@ you have coded the exercises efficiently, only very few adaptions need to be mad
 # code 'CZ'
 
 # Exercise 9
-czech_df <- create_df("CZ")
+czech_df <- create_df("PL")
 head(czech_df, 10)
 dim(czech_df)
 
