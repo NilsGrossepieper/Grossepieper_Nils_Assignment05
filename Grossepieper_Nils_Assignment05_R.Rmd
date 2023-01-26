@@ -406,11 +406,11 @@ plot.caption = element_text(face = "italic"))
 # Exercise 11
 
 # Maximum longitude and latitude of Czech Republic:
-venue_de_adjust <- adapt_long_lat(czech_df, 12.053, 18.513, 48.331, 51.032)
+venue_cz_adjust <- adapt_long_lat(czech_df, 12.053, 18.513, 48.331, 51.032)
 
 # visualize venues with new
 # based on the code that is mentioned in the assignment 
-ggplot(venue_de_adjust) +
+ggplot(venue_cz_adjust) +
 borders("world", "Czech Republic", colour = "black", fill = "grey90") +
   # add geom_point to create points for the locations
   # add alpha to make points transparent (-> to make overlaying points visible)
